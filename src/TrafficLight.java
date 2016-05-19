@@ -29,20 +29,15 @@ public class TrafficLight implements Runnable {
                     else {
                         //Get minutes passed from Traffic Light start to user's requested minute
                         int minutesPassed = getMinutesDiff(minutes_from_user_input);
-                        //Seems reasonable for me to see into last digit to dedicate current light
+                        //Seems reasonable for me to see into last  digit of minutes diff to dedicate current light
                         int minute = minutesPassed % 10;
-                        if (minute == 0 || minute == 1) {
-                            System.out.println(COLORS.GREEN);
-                        } else if (minute == 2 || minute == 3 || minute == 4) {
-                            System.out.println(COLORS.YELLOW);
-                        } else {
-                            System.out.println(COLORS.RED);
-                        }
+                        outputColor(minute);
                     }
                     //Allow another input without app restart
                     input_from_user = inputReader.readLine();
                 }
                 //Shut down thread if user input == 'exit'
+                inputReader.close();
                 Thread.currentThread().interrupt();
                 return;
             //Do not shut down app if non-numeric values entered
@@ -58,5 +53,15 @@ public class TrafficLight implements Runnable {
         long timestampOfRequestedMinute = traffic_light_started + (long) Math.floor(requested_minutes) * 60;
         long diff = timestampOfRequestedMinute - traffic_light_started;
         return (int) diff / 60;
+    }
+
+    public void outputColor(int minute) {
+        if (minute == 0 || minute == 1) {
+            System.out.println(COLORS.GREEN);
+        } else if (minute == 2 || minute == 3 || minute == 4) {
+            System.out.println(COLORS.YELLOW);
+        } else {
+            System.out.println(COLORS.RED);
+        }
     }
 }
