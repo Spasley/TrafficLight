@@ -6,7 +6,7 @@ public class TrafficLight implements Runnable {
 
     //Let's hide some values which user should not change
     //get unix time start when thread (traffic light) started
-    private long traffic_light_started = System.currentTimeMillis() / 1000L;
+    private long trafficLightStarted = System.currentTimeMillis() / 1000L;
     private volatile boolean isRunning = true;
     private enum COLORS {GREEN, YELLOW, RED}
 
@@ -15,26 +15,26 @@ public class TrafficLight implements Runnable {
         System.out.println("Hello! Please input minutes value and application will return current traffic light color. " +
                 "Input \"Exit\" for exit");
         while (isRunning) {
-            BufferedReader inputReader = new BufferedReader(new InputStreamReader(System.in));
-            try {
-                String input_from_user = inputReader.readLine();
+            //BufferedReader inputReader = new BufferedReader(new InputStreamReader(System.in));
+            try (BufferedReader inputReader = new BufferedReader(new InputStreamReader(System.in))) {
+                String inputFromUser = inputReader.readLine();
                 //Allow user escape the app gracefully
-                while (!input_from_user.toLowerCase().equals("exit")) {
+                while (!inputFromUser.toLowerCase().equals("exit")) {
                     //Check if input could be recognized as 'minutes'. Allow use partial values.
-                    Double minutes_from_user_input = Double.parseDouble(input_from_user);
+                    Double minutesFromUserInput = Double.parseDouble(inputFromUser);
                     //Can't return light for period when Traffic Light was disabled
-                    if (minutes_from_user_input < 0) {
+                    if (minutesFromUserInput < 0) {
                         System.out.println("Please input positive numeric value or input \"Exit\" for exit.");
                     }
                     else {
                         //Get minutes passed from Traffic Light start to user's requested minute
-                        int minutesPassed = getMinutesDiff(minutes_from_user_input);
+                        int minutesPassed = getMinutesDiff(minutesFromUserInput);
                         //Seems reasonable for me to see into last  digit of minutes diff to dedicate current light
-                        int minute = minutesPassed % 10;
-                        outputColor(minute);
+                        int requestedMinuteOfPeriod = minutesPassed % 10;
+                        outputColor(requestedMinuteOfPeriod);
                     }
                     //Allow another input without app restart
-                    input_from_user = inputReader.readLine();
+                    inputFromUser = inputReader.readLine();
                 }
                 //Shut down thread if user input == 'exit'
                 inputReader.close();
@@ -44,14 +44,13 @@ public class TrafficLight implements Runnable {
             } catch (IOException | NumberFormatException exc) {
                 System.out.println("Please input positive numeric value or input \"Exit\" for exit.");
             }
-
         }
     }
 
-    public int getMinutesDiff(Double requested_minutes) {
+    public int getMinutesDiff(Double requestedMinutes) {
         //Calculating how many minutes passed from Traffic Light start to user's requested minute
-        long timestampOfRequestedMinute = traffic_light_started + (long) Math.floor(requested_minutes) * 60;
-        long diff = timestampOfRequestedMinute - traffic_light_started;
+        long timestampOfRequestedMinute = trafficLightStarted + (long) Math.floor(requestedMinutes) * 60;
+        long diff = timestampOfRequestedMinute - trafficLightStarted;
         return (int) diff / 60;
     }
 
@@ -64,4 +63,5 @@ public class TrafficLight implements Runnable {
             System.out.println(COLORS.RED);
         }
     }
+
 }
